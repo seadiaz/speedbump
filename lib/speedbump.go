@@ -157,10 +157,6 @@ func (s *Speedbump) Stop() {
 	s.log.Info("Speedbump stopped")
 }
 
-const _maxAttempts = 10
-
-var startOnce sync.Once
-
 func (s *Speedbump) Enable() {
 	s.disabled = false
 	for _, conn := range s.activeConnections {
