@@ -113,13 +113,13 @@ func (s *Speedbump) startAcceptLoop() {
 		}
 		s.nextConnId++
 		s.active.Add(1)
+		s.currentConnection = p
 		go s.startProxyConnection(p)
 	}
 }
 
 func (s *Speedbump) startProxyConnection(p *connection) {
 	defer s.active.Done()
-	s.currentConnection = p
 	// start will block until a proxy connection is closed
 	p.start()
 }
