@@ -28,7 +28,7 @@ type Speedbump struct {
 	log       hclog.Logger
 	disabled  bool
 
-	currentConnection *connection
+	activeConnections []*connection
 }
 
 // SpeedbumpCfg contains Spedbump instance configuration
@@ -113,7 +113,7 @@ func (s *Speedbump) startAcceptLoop() {
 		}
 		s.nextConnId++
 		s.active.Add(1)
-		s.currentConnection = p
+		s.activeConnections = append(s.activeConnections, p)
 		go s.startProxyConnection(p)
 	}
 }
@@ -157,10 +157,20 @@ func (s *Speedbump) Stop() {
 	s.log.Info("Speedbump stopped")
 }
 
+const _maxAttempts = 10
+
+var startOnce sync.Once
+
 func (s *Speedbump) Enable() {
-	s.currentConnection.Enable()
+	s.disabled = false
+	for _, conn := range s.activeConnections {
+		conn.Enable()
+	}
 }
 
 func (s *Speedbump) Disable() {
-	s.currentConnection.Disable()
+	s.disabled = true
+	for _, conn := range s.activeConnections {
+		conn.Disable()
+	}
 }
